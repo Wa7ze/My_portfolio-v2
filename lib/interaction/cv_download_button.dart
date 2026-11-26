@@ -57,9 +57,8 @@ class _CvDownloadButtonState extends State<CvDownloadButton> {
     final busy = _phase != _Phase.idle;
 
     return Interactive(
-      child: GestureDetector(
-        onTap: busy ? null : _activate,
-        child: AnimatedContainer(
+      onTap: busy ? null : _activate,
+      child: AnimatedContainer(
           duration: Motion.handshake,
           curve: Motion.out,
           width: 180,
@@ -72,7 +71,6 @@ class _CvDownloadButtonState extends State<CvDownloadButton> {
           alignment: Alignment.center,
           child: _buildContent(),
         ),
-      ),
     );
   }
 

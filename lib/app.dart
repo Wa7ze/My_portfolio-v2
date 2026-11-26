@@ -7,6 +7,7 @@ import 'navigation/nav_bar.dart';
 import 'router.dart';
 import 'widgets/custom_cursor.dart';
 import 'widgets/idle_watcher.dart';
+import 'widgets/skip_link.dart';
 import 'widgets/terminal_launcher.dart';
 
 class App extends StatelessWidget {
@@ -47,6 +48,7 @@ class App extends StatelessWidget {
               children: [
                 Positioned.fill(child: child ?? const SizedBox.shrink()),
                 const Positioned(top: 0, left: 0, right: 0, child: NavBar()),
+                SkipLink(controller: context.watch<SkipLinkController>()),
               ],
             ),
           ),

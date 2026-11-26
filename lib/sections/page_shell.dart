@@ -13,6 +13,7 @@ import '../scene/path_painter.dart';
 import '../scroll/eof_scroll_physics.dart';
 import '../scroll/scroll_progress.dart';
 import '../widgets/latency_counter.dart';
+import '../widgets/skip_link.dart';
 import 's0_browser_hero.dart';
 import 's1_network_about.dart';
 import 's2_gateway_skills.dart';
@@ -36,7 +37,9 @@ class PageShell extends StatefulWidget {
 
 class _PageShellState extends State<PageShell> with WidgetsBindingObserver {
   final ScrollController controller = ScrollController();
+  final FocusNode _contentFocus = FocusNode(debugLabel: 'page content (skip link target)');
   ScrollProgress? _scrollProgress;
+  SkipLinkController? _skipLink;
   bool _initialHashHandled = false;
   SectionId? _lastHashSection;
 
@@ -62,6 +65,12 @@ class _PageShellState extends State<PageShell> with WidgetsBindingObserver {
       scrollProgress.attach(controller);
       scrollProgress.addListener(_onScrollProgressChanged);
       _scrollProgress = scrollProgress;
+    }
+    final skipLink = context.read<SkipLinkController>();
+    if (!identical(_skipLink, skipLink)) {
+      _skipLink?.detach(_contentFocus);
+      skipLink.attach(_contentFocus);
+      _skipLink = skipLink;
     }
   }
 
@@ -135,6 +144,8 @@ class _PageShellState extends State<PageShell> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _scrollProgress?.removeListener(_onScrollProgressChanged);
     _scrollProgress?.detach(controller);
+    _skipLink?.detach(_contentFocus);
+    _contentFocus.dispose();
     controller.dispose();
     super.dispose();
   }
@@ -145,7 +156,7 @@ class _PageShellState extends State<PageShell> with WidgetsBindingObserver {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
-          const Positioned.fill(child: BackgroundLayer()),
+          const Positioned.fill(child: ExcludeSemantics(child: BackgroundLayer())),
           Listener(
             onPointerSignal: _onPointerSignal,
             child: NotificationListener<OverscrollNotification>(
@@ -153,7 +164,11 @@ class _PageShellState extends State<PageShell> with WidgetsBindingObserver {
               child: SingleChildScrollView(
                 controller: controller,
                 physics: const EofScrollPhysics(),
-                child: ClickRouter(
+                child: Focus(
+                  focusNode: _contentFocus,
+                  skipTraversal: true,
+                  descendantsAreFocusable: true,
+                  child: ClickRouter(
                   child: Stack(
                     children: const [
                       Column(
@@ -169,10 +184,11 @@ class _PageShellState extends State<PageShell> with WidgetsBindingObserver {
                           TeardownFooterSection(),
                         ],
                       ),
-                      Positioned.fill(child: IgnorePointer(child: PathLayer())),
-                      Positioned.fill(child: IgnorePointer(child: PakWidget())),
-                      Positioned.fill(child: EffectsLayer()),
+                      Positioned.fill(child: ExcludeSemantics(child: IgnorePointer(child: PathLayer()))),
+                      Positioned.fill(child: ExcludeSemantics(child: IgnorePointer(child: PakWidget()))),
+                      Positioned.fill(child: ExcludeSemantics(child: EffectsLayer())),
                     ],
+                  ),
                   ),
                 ),
               ),

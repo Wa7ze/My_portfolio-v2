@@ -22,7 +22,10 @@ class LogicApproachSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Approach', style: (isMobile ? AppType.h2Mobile : AppType.h2).copyWith(color: palette.textPrimary)),
+          Semantics(
+            header: true,
+            child: Text('Approach', style: (isMobile ? AppType.h2Mobile : AppType.h2).copyWith(color: palette.textPrimary)),
+          ),
           const SizedBox(height: AppSpacing.s24),
           for (int i = 0; i < PortfolioContent.approachPrinciples.length; i++)
             Padding(

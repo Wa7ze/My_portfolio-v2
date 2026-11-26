@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/reduced_motion.dart';
 import '../../core/tokens.dart';
 
 /// A floating status-code badge, used by [NetButton] results and the 429
@@ -52,16 +53,20 @@ class _FloatingBadgeState extends State<_FloatingBadge> with SingleTickerProvide
   @override
   Widget build(BuildContext context) {
     final color = widget.isError ? AppColors.errRed : AppColors.okGreen;
+    final reduced = MotionPrefs.of(context).reduced;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
         final t = Motion.out.transform(_controller.value);
+        // Reduced motion: fade in place, no upward float.
+        final floatT = reduced ? 0.0 : t;
+        final fadeT = reduced ? (t < 0.15 ? t / 0.15 : 1.0) : 1 - t;
         return Positioned(
           left: widget.position.dx - 60,
-          top: widget.position.dy - 16 - 32 * t,
+          top: widget.position.dy - 16 - 32 * floatT,
           width: 120,
           child: Opacity(
-            opacity: 1 - t,
+            opacity: reduced ? fadeT * (t > 0.85 ? (1 - t) / 0.15 : 1.0) : fadeT,
             child: Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s12, vertical: AppSpacing.s4),

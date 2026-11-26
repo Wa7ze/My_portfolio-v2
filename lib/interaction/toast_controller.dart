@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/semantics.dart';
 
 /// Minimal toast queue — enough to surface NetButton errors and the 429
 /// rate-limit response. Full idle/toast polish is phase 6; this is the
@@ -20,6 +21,9 @@ class ToastController extends ChangeNotifier {
     final entry = ToastEntry(id: UniqueKey(), message: message, isError: isError);
     _current = entry;
     notifyListeners();
+    // Toasts carry meaning (429, 408, reconnected) — screen readers would
+    // otherwise never see this transient, non-focusable banner.
+    SemanticsService.announce(message, TextDirection.ltr);
     Future.delayed(_displayDuration, () {
       if (_current?.id == entry.id) {
         _current = null;

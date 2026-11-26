@@ -29,9 +29,12 @@ class BrowserHeroSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Mazen Matran',
-            style: (isMobile ? AppType.h1Mobile : AppType.display).copyWith(color: palette.textPrimary),
+          Semantics(
+            header: true,
+            child: Text(
+              'Mazen Matran',
+              style: (isMobile ? AppType.h1Mobile : AppType.display).copyWith(color: palette.textPrimary),
+            ),
           ),
           const SizedBox(height: AppSpacing.s8),
           Text(

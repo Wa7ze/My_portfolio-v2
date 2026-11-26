@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../core/reduced_motion.dart';
 import '../core/tokens.dart';
 import '../interaction/effects_controller.dart';
 import '../scene/request_path.dart';
@@ -21,19 +22,24 @@ class NavController extends ChangeNotifier {
 
     final scrollProgress = context.read<ScrollProgress>();
     final fromSection = scrollProgress.activeSection;
+    final reduced = MotionPrefs.of(context).reduced;
 
-    final width = MediaQuery.sizeOf(context).width;
-    final gutterWidth = AppBreakpoints.isMobile(width) ? AppLayout.mobileGutter : AppLayout.desktopGutter;
-    final direction = Directionality.of(context);
-    final path = RequestPath.build(gutterWidth: gutterWidth, direction: direction);
+    if (!reduced) {
+      final width = MediaQuery.sizeOf(context).width;
+      final gutterWidth = AppBreakpoints.isMobile(width) ? AppLayout.mobileGutter : AppLayout.desktopGutter;
+      final direction = Directionality.of(context);
+      final path = RequestPath.build(gutterWidth: gutterWidth, direction: direction);
 
-    context.read<EffectsController>().setTraceroute(
-          path.lengthForStation(fromSection),
-          path.lengthForStation(id),
-        );
+      context.read<EffectsController>().setTraceroute(
+            path.lengthForStation(fromSection),
+            path.lengthForStation(id),
+          );
+    }
 
     Duration duration;
-    if (fixedDuration != null) {
+    if (reduced) {
+      duration = const Duration(milliseconds: 200);
+    } else if (fixedDuration != null) {
       duration = fixedDuration;
     } else {
       final currentOffset = Scrollable.of(targetContext).position.pixels;

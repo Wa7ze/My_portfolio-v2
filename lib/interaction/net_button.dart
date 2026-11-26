@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../core/reduced_motion.dart';
 import '../core/tokens.dart';
 import 'effects_controller.dart';
 import 'interactive.dart';
@@ -53,9 +55,13 @@ class _NetButtonState extends State<NetButton> {
 
   Future<void> _activate() async {
     if (_phase != _Phase.idle) return;
-    setState(() => _phase = _Phase.handshaking);
-    await Future.delayed(Motion.handshake);
-    if (!mounted) return;
+    final reduced = MotionPrefs.of(context).reduced;
+
+    if (!reduced) {
+      setState(() => _phase = _Phase.handshaking);
+      await Future.delayed(Motion.handshake);
+      if (!mounted) return;
+    }
 
     NetResult result;
     try {
@@ -68,11 +74,16 @@ class _NetButtonState extends State<NetButton> {
     setState(() => _phase = result.success ? _Phase.success : _Phase.error);
     _showBadge(result);
 
-    await Future.delayed(Motion.badgeFloat);
+    await Future.delayed(reduced ? Duration.zero : Motion.badgeFloat);
     if (mounted) setState(() => _phase = _Phase.idle);
   }
 
   void _showBadge(NetResult result) {
+    if (!result.success) {
+      // Errors carry meaning the floating badge alone won't reach a
+      // screen reader with (it's decorative/transient, not focusable).
+      SemanticsService.announce('${result.statusCode} ${result.label}', TextDirection.ltr, assertiveness: Assertiveness.assertive);
+    }
     final box = context.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize) return;
     final globalCenter = box.localToGlobal(box.size.center(Offset.zero));

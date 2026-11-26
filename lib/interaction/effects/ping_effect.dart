@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/reduced_motion.dart';
 import '../../core/tokens.dart';
 
 /// 2 concentric rings + center dot + a floating label, playing once over
@@ -29,6 +30,7 @@ class _PingEffectState extends State<PingEffect> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    final reduced = MotionPrefs.of(context).reduced;
     const boxSize = 120.0;
     return Positioned(
       left: widget.position.dx - boxSize / 2,
@@ -39,21 +41,20 @@ class _PingEffectState extends State<PingEffect> with SingleTickerProviderStateM
         animation: _controller,
         builder: (context, _) {
           final t = Motion.out.transform(_controller.value);
-          return Opacity(
-            opacity: 1 - t,
-            child: CustomPaint(
-              painter: _PingPainter(t: t),
-              child: Center(
-                child: Transform.translate(
-                  offset: Offset(0, -28 * t),
-                  child: Text(
-                    widget.label,
-                    textDirection: TextDirection.ltr,
-                    style: AppType.monoLabel.copyWith(color: AppColors.netCyan),
-                  ),
-                ),
+          final label = Center(
+            child: Transform.translate(
+              offset: Offset(0, reduced ? 0 : -28 * t),
+              child: Text(
+                widget.label,
+                textDirection: TextDirection.ltr,
+                style: AppType.monoLabel.copyWith(color: AppColors.netCyan),
               ),
             ),
+          );
+          return Opacity(
+            // Reduced motion: label only, no expanding rings.
+            opacity: 1 - t,
+            child: reduced ? label : CustomPaint(painter: _PingPainter(t: t), child: label),
           );
         },
       ),

@@ -33,10 +33,8 @@ class NetLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Interactive(
-      child: GestureDetector(
-        onTap: () => _activate(context),
-        child: child,
-      ),
+      onTap: () => _activate(context),
+      child: child,
     );
   }
 }

@@ -119,20 +119,18 @@ class _Logo extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = AppPalette.of(context);
     return Interactive(
-      child: GestureDetector(
-        onTap:
-            () => context.read<NavController>().goTo(
-              context,
-              SectionId.browserHero,
-            ),
-        onLongPress: () => context.read<TerminalLauncherController>().requestOpen(),
-        child: Text(
-          '<mm/>',
-          textDirection: TextDirection.ltr,
-          style: AppType.mono.copyWith(
-            color: palette.textPrimary,
-            fontWeight: FontWeight.w700,
+      onTap:
+          () => context.read<NavController>().goTo(
+            context,
+            SectionId.browserHero,
           ),
+      onLongPress: () => context.read<TerminalLauncherController>().requestOpen(),
+      child: Text(
+        '<mm/>',
+        textDirection: TextDirection.ltr,
+        style: AppType.mono.copyWith(
+          color: palette.textPrimary,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
@@ -182,40 +180,38 @@ class _NavItemState extends State<_NavItem> {
     final palette = AppPalette.of(context);
     final accent = AppColors.netCyan;
     return Interactive(
+      onTap: () => context.read<NavController>().goTo(context, widget.id),
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
-        child: GestureDetector(
-          onTap: () => context.read<NavController>().goTo(context, widget.id),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  widget.label,
-                  style: AppType.body.copyWith(
-                    fontSize: 14,
-                    color:
-                        widget.isActive
-                            ? accent
-                            : (_hovered
-                                ? palette.textPrimary
-                                : palette.textSecondary),
-                    fontWeight:
-                        widget.isActive ? FontWeight.w700 : FontWeight.w500,
-                  ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                widget.label,
+                style: AppType.body.copyWith(
+                  fontSize: 14,
+                  color:
+                      widget.isActive
+                          ? accent
+                          : (_hovered
+                              ? palette.textPrimary
+                              : palette.textSecondary),
+                  fontWeight:
+                      widget.isActive ? FontWeight.w700 : FontWeight.w500,
                 ),
-                const SizedBox(height: 4),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  height: 2,
-                  width: widget.isActive ? 16 : 0,
-                  color: accent,
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 4),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                height: 2,
+                width: widget.isActive ? 16 : 0,
+                color: accent,
+              ),
+            ],
           ),
         ),
       ),
@@ -293,24 +289,22 @@ class _LocalePill extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = AppPalette.of(context);
     return Interactive(
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: isActive ? AppColors.netCyan : Colors.transparent,
-            border: Border.all(
-              color: isActive ? AppColors.netCyan : palette.line,
-            ),
-            borderRadius: BorderRadius.circular(AppRadii.sm),
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.netCyan : Colors.transparent,
+          border: Border.all(
+            color: isActive ? AppColors.netCyan : palette.line,
           ),
-          child: Text(
-            label,
-            textDirection: TextDirection.ltr,
-            style: AppType.monoLabel.copyWith(
-              color: isActive ? palette.bg : palette.textSecondary,
-            ),
+          borderRadius: BorderRadius.circular(AppRadii.sm),
+        ),
+        child: Text(
+          label,
+          textDirection: TextDirection.ltr,
+          style: AppType.monoLabel.copyWith(
+            color: isActive ? palette.bg : palette.textSecondary,
           ),
         ),
       ),

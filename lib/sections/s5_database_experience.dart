@@ -23,7 +23,10 @@ class DatabaseExperienceSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(strings.experienceTitle, style: (isMobile ? AppType.h2Mobile : AppType.h2).copyWith(color: palette.textPrimary)),
+          Semantics(
+            header: true,
+            child: Text(strings.experienceTitle, style: (isMobile ? AppType.h2Mobile : AppType.h2).copyWith(color: palette.textPrimary)),
+          ),
           const SizedBox(height: AppSpacing.s24),
           Container(
             padding: const EdgeInsets.all(AppSpacing.s16),

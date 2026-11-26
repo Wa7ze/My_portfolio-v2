@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../core/reduced_motion.dart';
 import '../core/tokens.dart';
 import '../scroll/layers.dart';
 import '../scroll/scroll_progress.dart';
@@ -42,6 +43,7 @@ class _BackgroundLayerState extends State<BackgroundLayer> with SingleTickerProv
   Widget build(BuildContext context) {
     final scrollProgress = context.watch<ScrollProgress>();
     final palette = AppPalette.of(context);
+    final reduced = MotionPrefs.of(context).reduced;
     _maybeBlend(scrollProgress.activeLayer);
     final accent = NetLayers.accentFor(scrollProgress.activeLayer);
 
@@ -55,7 +57,7 @@ class _BackgroundLayerState extends State<BackgroundLayer> with SingleTickerProv
             line: palette.line,
             accent: accent,
             blend: Motion.out.transform(_blend.value),
-            parallaxOffset: scrollProgress.offsetPx * 0.3,
+            parallaxOffset: reduced ? 0 : scrollProgress.offsetPx * 0.3,
           ),
         ),
       ),

@@ -36,7 +36,10 @@ class ResponseContactSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(strings.contactTitle, style: (isMobile ? AppType.h2Mobile : AppType.h2).copyWith(color: palette.textPrimary)),
+          Semantics(
+            header: true,
+            child: Text(strings.contactTitle, style: (isMobile ? AppType.h2Mobile : AppType.h2).copyWith(color: palette.textPrimary)),
+          ),
           const SizedBox(height: AppSpacing.s16),
           Text(strings.contactSubtitle, style: AppType.body.copyWith(color: palette.textSecondary)),
           const SizedBox(height: AppSpacing.s32),

@@ -21,7 +21,10 @@ class GatewaySkillsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(strings.skillsTitle, style: (isMobile ? AppType.h2Mobile : AppType.h2).copyWith(color: palette.textPrimary)),
+          Semantics(
+            header: true,
+            child: Text(strings.skillsTitle, style: (isMobile ? AppType.h2Mobile : AppType.h2).copyWith(color: palette.textPrimary)),
+          ),
           const SizedBox(height: AppSpacing.s24),
           ...strings.skillGroups.entries.map(
             (group) => Padding(

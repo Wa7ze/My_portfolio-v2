@@ -13,6 +13,7 @@ import 'scene/pak/pak_state.dart';
 import 'scroll/scroll_progress.dart';
 import 'widgets/custom_cursor.dart';
 import 'widgets/idle_watcher.dart';
+import 'widgets/skip_link.dart';
 import 'widgets/terminal_launcher.dart';
 
 @JS('bootDone')
@@ -37,6 +38,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => CursorController()),
         ChangeNotifierProvider(create: (_) => IdleController()),
         ChangeNotifierProvider(create: (_) => TerminalLauncherController()),
+        ChangeNotifierProvider(create: (_) => SkipLinkController()),
       ],
       child: const App(),
     ),

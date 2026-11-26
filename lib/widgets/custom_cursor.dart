@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import '../core/reduced_motion.dart';
 import '../core/tokens.dart';
 
 /// Tracks whether the pointer is currently over an [Interactive] (or
@@ -108,6 +109,7 @@ class _CustomCursorState extends State<CustomCursor> {
 
   @override
   Widget build(BuildContext context) {
+    if (MotionPrefs.of(context).reduced) return widget.child;
     final showCustom = _mouseSeen && !_disabledForSession;
     return MouseRegion(
       cursor: showCustom ? SystemMouseCursors.none : MouseCursor.defer,
@@ -132,8 +134,10 @@ class _CustomCursorState extends State<CustomCursor> {
             widget.child,
             if (showCustom)
               Positioned.fill(
-                child: IgnorePointer(
-                  child: CustomPaint(painter: _CursorPainter(_visual)),
+                child: ExcludeSemantics(
+                  child: IgnorePointer(
+                    child: CustomPaint(painter: _CursorPainter(_visual)),
+                  ),
                 ),
               ),
           ],

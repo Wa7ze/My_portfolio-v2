@@ -37,7 +37,10 @@ class _ApiProjectsSectionState extends State<ApiProjectsSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(strings.workPageTitle, style: (isMobile ? AppType.h2Mobile : AppType.h2).copyWith(color: palette.textPrimary)),
+          Semantics(
+            header: true,
+            child: Text(strings.workPageTitle, style: (isMobile ? AppType.h2Mobile : AppType.h2).copyWith(color: palette.textPrimary)),
+          ),
           const SizedBox(height: AppSpacing.s8),
           Text(strings.workPageSubtitle, style: AppType.body.copyWith(color: palette.textSecondary)),
           const SizedBox(height: AppSpacing.s32),
@@ -91,26 +94,24 @@ class _ProjectCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Interactive(
-            child: GestureDetector(
-              onTap: onToggle,
-              child: Row(
-                children: [
-                  Text('GET', style: AppType.monoLabel.copyWith(color: AppColors.okGreen)),
-                  const SizedBox(width: AppSpacing.s8),
-                  Expanded(
-                    child: Text(
-                      '/projects/${project.slug}',
-                      textDirection: TextDirection.ltr,
-                      style: AppType.mono.copyWith(color: palette.textMuted),
-                    ),
+            onTap: onToggle,
+            child: Row(
+              children: [
+                Text('GET', style: AppType.monoLabel.copyWith(color: AppColors.okGreen)),
+                const SizedBox(width: AppSpacing.s8),
+                Expanded(
+                  child: Text(
+                    '/projects/${project.slug}',
+                    textDirection: TextDirection.ltr,
+                    style: AppType.mono.copyWith(color: palette.textMuted),
                   ),
-                  Icon(
-                    expanded ? Icons.expand_less : Icons.expand_more,
-                    size: 18,
-                    color: palette.textMuted,
-                  ),
-                ],
-              ),
+                ),
+                Icon(
+                  expanded ? Icons.expand_less : Icons.expand_more,
+                  size: 18,
+                  color: palette.textMuted,
+                ),
+              ],
             ),
           ),
           const SizedBox(height: AppSpacing.s8),
