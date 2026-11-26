@@ -6,6 +6,7 @@ import 'interaction/effects_controller.dart';
 import 'interaction/handled_pointers.dart';
 import 'interaction/rate_limiter.dart';
 import 'interaction/toast_controller.dart';
+import 'navigation/nav_controller.dart';
 import 'scene/pak/pak_state.dart';
 import 'scroll/scroll_progress.dart';
 
@@ -23,6 +24,7 @@ void main() {
         Provider(create: (_) => RateLimiter()),
         ChangeNotifierProvider(create: (_) => EffectsController()),
         ChangeNotifierProvider(create: (_) => ToastController()),
+        ChangeNotifierProvider(create: (_) => NavController()),
       ],
       child: const App(),
     ),

@@ -8,7 +8,13 @@ class EnStrings extends AppStrings {
   @override
   String get navAbout => 'About';
   @override
+  String get navSkills => 'Skills';
+  @override
   String get navWork => 'My Work';
+  @override
+  String get navApproach => 'Approach';
+  @override
+  String get navExperience => 'Experience';
   @override
   String get navContact => 'Get in touch';
   @override

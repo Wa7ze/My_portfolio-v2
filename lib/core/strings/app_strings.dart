@@ -32,7 +32,10 @@ abstract class AppStrings {
   // Nav / shell
   String get navHome;
   String get navAbout;
+  String get navSkills;
   String get navWork;
+  String get navApproach;
+  String get navExperience;
   String get navContact;
   String get sidebarThemeLight;
   String get sidebarThemeDark;

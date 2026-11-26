@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../core/strings/app_strings.dart';
 import '../core/tokens.dart';
 import '../interaction/net_button.dart';
+import '../navigation/nav_controller.dart';
 import '../navigation/section_registry.dart';
 import 'section_scaffold.dart';
 
@@ -23,10 +25,7 @@ class BrowserHeroSection extends StatelessWidget {
   }
 
   Future<NetResult> _viewProjectsRequest(BuildContext context) async {
-    final target = SectionRegistry.keyFor(SectionId.apiProjects).currentContext;
-    if (target != null) {
-      await Scrollable.ensureVisible(target, duration: const Duration(milliseconds: 700), curve: Curves.easeInOut);
-    }
+    context.read<NavController>().goTo(context, SectionId.apiProjects);
     return const NetResult.success();
   }
 

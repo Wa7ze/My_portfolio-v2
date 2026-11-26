@@ -72,6 +72,56 @@ treatment/HTML boot-loader, final cross-browser polish) are deferred.
    locales filled in as it's written — don't let new bilingual gaps
    accumulate silently.
 
+## Console-error investigation (phases 1-4) — fixed, plus one remaining known quirk
+
+A recurring `Bad state: RenderBox was not laid out` console error was
+chased across phases 1-4 via a debug-mode (`flutter run -d web-server`)
+build, which gives readable (non-minified) stack traces — release-mode
+minification had been hiding the real cause and symptom-matching it to the
+wrong source more than once along the way. Two distinct, now-fixed bugs
+were found, plus one confirmed pre-existing framework quirk that is left
+as-is:
+
+1. **Fixed — `SelectionArea` had no `Overlay` ancestor.** `SelectionArea`
+   lived in `app.dart`'s `MaterialApp.router` `builder`, which sits outside
+   go_router's own `Navigator`/`Overlay`. `SelectableRegion` requires an
+   `Overlay` ancestor and threw on every build. Fixed by moving
+   `SelectionArea` to wrap each route's content inside `router.dart`
+   instead (still covers all real page content; only the nav bar's own
+   short labels, which don't need to be selectable, are outside it now).
+2. **Fixed — go_router hash-strategy conflict in `HashSync`.** This app
+   uses go_router's *hash* URL strategy (confirmed empirically: `#/bogus`
+   404s, `#/` loads fine) — the content after `#/` is the actual matched
+   path, not a free-form fragment. The original `HashSync` wrote bare
+   fragments like `#about`, which go_router parsed as path `about` with no
+   matching route, 404ing on every load/reload once a hash was set — a
+   real, user-visible bug, not just console noise. Fixed by encoding the
+   section as a query parameter inside the valid `#/` path
+   (`#/?section=about`) instead. A second, related issue — calling
+   `history.replaceState` with a `null` state argument wiped out
+   go_router's own stored routing-match metadata, and calling it
+   synchronously from a click handler raced the Router's own
+   `restoreState` cycle — was fixed by passing the existing
+   `history.state` back unchanged and deferring the call via
+   `scheduleMicrotask`.
+   Other similarly-shaped fixes made along the way: `PathLayer`'s
+   `initState` read `MediaQuery` (via `MotionPrefs`) before dependencies
+   were available — moved to `didChangeDependencies`. `NavBar`'s
+   `IconButton`/`ListTile` had no `Material` ancestor (NavBar lives outside
+   any `Scaffold`) — wrapped in `Material(type: MaterialType.transparency)`,
+   with the mobile sheet's `ListTile`s getting their own opaque `Material`
+   for a visible background/ink splash.
+3. **Remaining, confirmed pre-existing and out of scope.** A separate
+   `RenderBox was not laid out` assertion fires from
+   `WidgetsBindingObserver.didChangeViewFocus` → Flutter's own
+   `FocusTraversalPolicy`/`_RenderTheater` internals — the entire stack
+   trace is Flutter framework/engine code with zero app frames. Confirmed
+   via isolation testing that it fires on a plain page load with
+   hash-sync code fully disabled, so it's unrelated to anything in this
+   app's control. It's caught by Flutter's own error boundary and doesn't
+   affect rendering or interaction (confirmed via screenshots at every
+   checkpoint) — left as a known environment/Flutter-engine quirk.
+
 ## Structural decision — certificate placement
 
 The PRD's 8 fixed sections have no dedicated certificates section. All 9

@@ -8,7 +8,13 @@ class ArStrings extends AppStrings {
   @override
   String get navAbout => 'نبذة عني';
   @override
+  String get navSkills => 'المهارات';
+  @override
   String get navWork => 'أعمالي';
+  @override
+  String get navApproach => 'النهج';
+  @override
+  String get navExperience => 'الخبرة';
   @override
   String get navContact => 'تواصل معي';
   @override
