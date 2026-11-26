@@ -4,6 +4,7 @@ import '../core/strings/app_strings.dart';
 import '../core/tokens.dart';
 import '../data/models.dart';
 import '../data/portfolio_content.dart';
+import '../interaction/interactive.dart';
 import '../navigation/section_registry.dart';
 import 'section_scaffold.dart';
 
@@ -92,9 +93,11 @@ class _ProjectCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.s16),
-          GestureDetector(
-            onTap: () => launchUrl(Uri.parse(project.githubUrl), mode: LaunchMode.externalApplication),
-            child: Text(strings.viewOnGithub, style: AppType.monoLabel.copyWith(color: AppColors.netCyan)),
+          Interactive(
+            child: GestureDetector(
+              onTap: () => launchUrl(Uri.parse(project.githubUrl), mode: LaunchMode.externalApplication),
+              child: Text(strings.viewOnGithub, style: AppType.monoLabel.copyWith(color: AppColors.netCyan)),
+            ),
           ),
         ],
       ),

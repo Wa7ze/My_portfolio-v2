@@ -2,30 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../core/strings/app_strings.dart';
 import '../core/tokens.dart';
+import '../interaction/net_button.dart';
 import '../navigation/section_registry.dart';
 import 'section_scaffold.dart';
 
 const _kCvPdfAsset = 'assets/files/Mazen_Matran_CV.pdf';
 
 /// Section 0 — Browser (hero). #home, browser layer, "GET / HTTP/1.1".
-/// Static for now — the real NetButton handshake state machine and
-/// traceroute-driven navigation land in phases 3-4.
 class BrowserHeroSection extends StatelessWidget {
   const BrowserHeroSection({super.key});
 
-  Future<void> _downloadCv() async {
+  Future<NetResult> _downloadCv() async {
     // Flutter web serves pubspec assets under an extra `assets/` prefix.
     final uri = Uri.base.resolve('assets/$_kCvPdfAsset');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+      return const NetResult.success(label: 'OK');
     }
+    return const NetResult.error(statusCode: 404, label: 'Not Found');
   }
 
-  void _viewProjects(BuildContext context) {
+  Future<NetResult> _viewProjectsRequest(BuildContext context) async {
     final target = SectionRegistry.keyFor(SectionId.apiProjects).currentContext;
     if (target != null) {
-      Scrollable.ensureVisible(target, duration: const Duration(milliseconds: 700), curve: Curves.easeInOut);
+      await Scrollable.ensureVisible(target, duration: const Duration(milliseconds: 700), curve: Curves.easeInOut);
     }
+    return const NetResult.success();
   }
 
   @override
@@ -62,13 +64,14 @@ class BrowserHeroSection extends StatelessWidget {
             spacing: AppSpacing.s16,
             runSpacing: AppSpacing.s16,
             children: [
-              ElevatedButton(
-                onPressed: () => _viewProjects(context),
-                child: Text(strings.heroCtaWork),
+              NetButton(
+                label: strings.heroCtaWork,
+                onRequest: () => _viewProjectsRequest(context),
               ),
-              OutlinedButton(
-                onPressed: _downloadCv,
-                child: Text(strings.downloadCvButton),
+              NetButton(
+                label: strings.downloadCvButton,
+                variant: NetButtonVariant.ghost,
+                onRequest: _downloadCv,
               ),
             ],
           ),

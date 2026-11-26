@@ -4,21 +4,24 @@ import '../core/strings/app_strings.dart';
 import '../core/tokens.dart';
 import '../data/models.dart';
 import '../data/portfolio_content.dart';
+import '../interaction/interactive.dart';
+import '../interaction/net_button.dart';
 import '../navigation/section_registry.dart';
 import 'section_scaffold.dart';
 
 /// Section 6 — Response (contact). #contact, response layer, "POST /contact".
 /// Contact uses the PRD's own mailto: fallback (no real form endpoint yet —
-/// see docs/AUDIT.md), plus the social links. Static for now — the real
-/// NetButton handshake state machine lands in phase 3.
+/// see docs/AUDIT.md), plus the social links.
 class ResponseContactSection extends StatelessWidget {
   const ResponseContactSection({super.key});
 
-  Future<void> _sendEmail() async {
+  Future<NetResult> _sendEmail() async {
     final uri = Uri(scheme: 'mailto', path: 'mmazen0132@gmail.com', query: 'subject=Hello from Portfolio&body=Hi Mazen,');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
+      return const NetResult.success();
     }
+    return const NetResult.error(statusCode: 503, label: 'No mail client');
   }
 
   @override
@@ -37,10 +40,10 @@ class ResponseContactSection extends StatelessWidget {
           const SizedBox(height: AppSpacing.s16),
           Text(strings.contactSubtitle, style: AppType.body.copyWith(color: palette.textSecondary)),
           const SizedBox(height: AppSpacing.s32),
-          ElevatedButton.icon(
-            onPressed: _sendEmail,
-            icon: const Icon(Icons.send),
-            label: Text(strings.contactEmailLabel),
+          NetButton(
+            label: strings.contactEmailLabel,
+            icon: Icons.send,
+            onRequest: _sendEmail,
           ),
           const SizedBox(height: AppSpacing.s32),
           Wrap(
@@ -63,21 +66,23 @@ class _SocialRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = AppPalette.of(context);
-    return GestureDetector(
-      onTap: () => launchUrl(Uri.parse(link.url), mode: LaunchMode.externalApplication),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16, vertical: AppSpacing.s12),
-        decoration: BoxDecoration(
-          border: Border.all(color: palette.line),
-          borderRadius: BorderRadius.circular(AppRadii.md),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(link.label, style: AppType.monoLabel.copyWith(color: palette.textMuted)),
-            Text(link.value, style: AppType.mono.copyWith(color: AppColors.netCyan)),
-          ],
+    return Interactive(
+      child: GestureDetector(
+        onTap: () => launchUrl(Uri.parse(link.url), mode: LaunchMode.externalApplication),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16, vertical: AppSpacing.s12),
+          decoration: BoxDecoration(
+            border: Border.all(color: palette.line),
+            borderRadius: BorderRadius.circular(AppRadii.md),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(link.label, style: AppType.monoLabel.copyWith(color: palette.textMuted)),
+              Text(link.value, style: AppType.mono.copyWith(color: AppColors.netCyan)),
+            ],
+          ),
         ),
       ),
     );

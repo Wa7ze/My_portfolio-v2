@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../interaction/click_router.dart';
+import '../interaction/effects_layer.dart';
 import '../navigation/section_registry.dart';
 import '../scene/background_layer.dart';
 import '../scene/pak/pak_widget.dart';
@@ -80,26 +82,30 @@ class _PageShellState extends State<PageShell> with WidgetsBindingObserver {
           const Positioned.fill(child: BackgroundLayer()),
           SingleChildScrollView(
             controller: controller,
-            child: Stack(
-              children: const [
-                Column(
-                  children: [
-                    BrowserHeroSection(),
-                    NetworkAboutSection(),
-                    GatewaySkillsSection(),
-                    ApiProjectsSection(),
-                    LogicApproachSection(),
-                    DatabaseExperienceSection(),
-                    ResponseContactSection(),
-                    TeardownFooterSection(),
-                  ],
-                ),
-                Positioned.fill(child: IgnorePointer(child: PathLayer())),
-                Positioned.fill(child: IgnorePointer(child: PakWidget())),
-              ],
+            child: ClickRouter(
+              child: Stack(
+                children: const [
+                  Column(
+                    children: [
+                      BrowserHeroSection(),
+                      NetworkAboutSection(),
+                      GatewaySkillsSection(),
+                      ApiProjectsSection(),
+                      LogicApproachSection(),
+                      DatabaseExperienceSection(),
+                      ResponseContactSection(),
+                      TeardownFooterSection(),
+                    ],
+                  ),
+                  Positioned.fill(child: IgnorePointer(child: PathLayer())),
+                  Positioned.fill(child: IgnorePointer(child: PakWidget())),
+                  Positioned.fill(child: EffectsLayer()),
+                ],
+              ),
             ),
           ),
           const LatencyCounter(),
+          const ToastHost(),
         ],
       ),
     );

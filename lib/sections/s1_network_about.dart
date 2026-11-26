@@ -4,6 +4,7 @@ import '../core/strings/app_strings.dart';
 import '../core/tokens.dart';
 import '../data/models.dart';
 import '../data/portfolio_content.dart';
+import '../interaction/interactive.dart';
 import '../navigation/section_registry.dart';
 import 'section_scaffold.dart';
 
@@ -96,11 +97,13 @@ class _CertificateList extends StatelessWidget {
                   Text(cert.date, style: AppType.mono.copyWith(color: palette.textMuted)),
                   if (cert.url != null) ...[
                     const SizedBox(height: AppSpacing.s8),
-                    GestureDetector(
-                      onTap: () => launchUrl(Uri.parse(cert.url!), mode: LaunchMode.externalApplication),
-                      child: Text(
-                        strings.verificationLinkLabel,
-                        style: AppType.monoLabel.copyWith(color: AppColors.netCyan),
+                    Interactive(
+                      child: GestureDetector(
+                        onTap: () => launchUrl(Uri.parse(cert.url!), mode: LaunchMode.externalApplication),
+                        child: Text(
+                          strings.verificationLinkLabel,
+                          style: AppType.monoLabel.copyWith(color: AppColors.netCyan),
+                        ),
                       ),
                     ),
                   ],
