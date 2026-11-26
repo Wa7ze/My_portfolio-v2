@@ -1,88 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'features/home/home_page.dart';
-import 'features/work/work_page.dart';
-import 'features/work/project_page.dart';
-import 'features/contact/contact_page.dart';
+import 'pages/not_found_page.dart';
+import 'sections/page_shell.dart';
 
+// SelectionArea wraps each route's content here, inside go_router's own
+// Navigator — wrapping it in app.dart's `builder` instead (outside the
+// Router) throws "No Overlay widget found" on every build, since
+// SelectableRegion needs an Overlay ancestor and the Router's own Overlay
+// lives inside its routed content, not above it.
 final router = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(
       path: '/',
       name: 'home',
-      pageBuilder: (ctx, st) => CustomTransitionPage(
-        child: const HomePage(),
-        transitionsBuilder: (ctx, anim, sec, child) => FadeTransition(
-          opacity: CurvedAnimation(parent: anim, curve: Curves.easeInOut),
-          child: SlideTransition(
-            position: Tween(begin: const Offset(0, 0.1), end: Offset.zero)
-                .chain(CurveTween(curve: Curves.easeOutCubic))
-                .animate(anim),
-            child: child,
-          ),
-        ),
-      ),
-    ),
-    GoRoute(
-      path: '/work',
-      name: 'work',
-      pageBuilder: (ctx, st) => CustomTransitionPage(
-        child: const WorkPage(),
-        transitionsBuilder: (ctx, anim, sec, child) => FadeTransition(
-          opacity: CurvedAnimation(parent: anim, curve: Curves.easeInOut),
-          child: SlideTransition(
-            position: Tween(begin: const Offset(0, 0.1), end: Offset.zero)
-                .chain(CurveTween(curve: Curves.easeOutCubic))
-                .animate(anim),
-            child: child,
-          ),
-        ),
-      ),
-    ),
-    GoRoute(
-      path: '/work/:slug',
-      name: 'project',
-      pageBuilder: (ctx, st) {
-        final slug = st.pathParameters['slug']!;
-        return CustomTransitionPage(
-          child: ProjectPage(slug: slug),
-          transitionsBuilder: (ctx, anim, sec, child) => FadeTransition(
-            opacity: CurvedAnimation(parent: anim, curve: Curves.easeInOut),
-            child: SlideTransition(
-              position: Tween(begin: const Offset(0, 0.1), end: Offset.zero)
-                  .chain(CurveTween(curve: Curves.easeOutCubic))
-                  .animate(anim),
-              child: child,
-            ),
-          ),
-        );
-      },
-    ),
-    // About's content now lives on Home; redirect old links there instead
-    // of 404ing.
-    GoRoute(
-      path: '/about',
-      redirect: (context, state) => '/',
-    ),
-    GoRoute(
-      path: '/contact',
-      name: 'contact',
-      pageBuilder: (ctx, st) => CustomTransitionPage(
-        child: const ContactPage(),
-        transitionsBuilder: (ctx, anim, sec, child) => FadeTransition(
-          opacity: CurvedAnimation(parent: anim, curve: Curves.easeInOut),
-          child: SlideTransition(
-            position: Tween(begin: const Offset(0, 0.1), end: Offset.zero)
-                .chain(CurveTween(curve: Curves.easeOutCubic))
-                .animate(anim),
-            child: child,
-          ),
-        ),
-      ),
+      builder: (context, state) => const SelectionArea(child: PageShell()),
     ),
   ],
-  errorBuilder: (ctx, st) => const Scaffold(
-    body: Center(child: Text('404 – Page not found')),
-  ),
+  errorBuilder: (context, state) => const SelectionArea(child: NotFoundPage()),
 );

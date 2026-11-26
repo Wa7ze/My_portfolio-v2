@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'core/app_state.dart';
-import 'core/theme.dart';
+import 'core/app_theme.dart';
 import 'router.dart';
-import 'widgets/app_chrome.dart';
 import 'widgets/opening_splash.dart';
 
 class App extends StatelessWidget {
@@ -17,8 +16,8 @@ class App extends StatelessWidget {
 
     return MaterialApp.router(
       title: 'Mazen Matran — Portfolio',
-      theme: buildLightTheme(),
-      darkTheme: buildDarkTheme(),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
       themeMode: themeController.isDark ? ThemeMode.dark : ThemeMode.light,
       locale: localeController.locale,
       supportedLocales: const [Locale('en'), Locale('ar')],
@@ -29,10 +28,10 @@ class App extends StatelessWidget {
       ],
       routerConfig: router,
       debugShowCheckedModeBanner: false,
-      builder: (context, child) => SelectionArea(
-        child: OpeningSplash(
-          child: AppChrome(child: child ?? const SizedBox.shrink()),
-        ),
+      // Text selectability (SelectionArea) is applied per-route instead,
+      // inside the Router — see router.dart for why.
+      builder: (context, child) => OpeningSplash(
+        child: child ?? const SizedBox.shrink(),
       ),
     );
   }
