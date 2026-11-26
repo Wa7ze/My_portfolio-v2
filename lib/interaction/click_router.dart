@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../scene/pak/pak_state.dart';
+import '../widgets/idle_watcher.dart';
 import 'effects_controller.dart';
 import 'handled_pointers.dart';
 import 'rate_limiter.dart';
@@ -33,6 +34,7 @@ class _ClickRouterState extends State<ClickRouter> {
   }
 
   void _onPointerDown(PointerDownEvent event) {
+    context.read<IdleController>().registerActivity();
     if (!_isPrimary(event)) return;
     _downPositions[event.pointer] = event.position;
     _downTimesMs[event.pointer] = DateTime.now().millisecondsSinceEpoch;
@@ -81,6 +83,8 @@ class _ClickRouterState extends State<ClickRouter> {
       onPointerDown: _onPointerDown,
       onPointerUp: _onPointerUp,
       onPointerCancel: _onPointerCancel,
+      onPointerHover: (_) => context.read<IdleController>().registerActivity(),
+      onPointerSignal: (_) => context.read<IdleController>().registerActivity(),
       child: widget.child,
     );
   }

@@ -37,6 +37,8 @@ dependencies:
   web: ^1.1.0                  # history.replaceState / location.hash (nav hash sync)
   flutter_localizations:
     sdk: flutter                # RTL/LTR + locale support (en/ar)
+  flutter_web_plugins:
+    sdk: flutter                # usePathUrlStrategy()
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -17,5 +17,5 @@ final router = GoRouter(
       builder: (context, state) => const SelectionArea(child: PageShell()),
     ),
   ],
-  errorBuilder: (context, state) => const SelectionArea(child: NotFoundPage()),
+  errorBuilder: (context, state) => SelectionArea(child: NotFoundPage(requestedPath: state.uri.toString())),
 );

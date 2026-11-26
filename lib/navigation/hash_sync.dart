@@ -2,17 +2,14 @@ import 'dart:async';
 import 'package:web/web.dart' as web;
 import 'section_registry.dart';
 
-/// Syncs the active section into the URL — as a `section` query parameter
-/// inside the `#/` fragment (`#/?section=about`), never as a bare fragment
-/// (`#about`).
+/// Syncs the active section into the URL as a bare `#about`-style fragment.
 ///
-/// This app uses go_router's *hash* URL strategy (confirmed empirically:
-/// `#/bogus` 404s, `#/` loads fine), meaning the content after `#/` is the
-/// actual matched *path* — a bare `#about` is parsed as path "about", which
-/// has no matching route and renders the 404 page on every load/reload.
-/// Keeping the path at `/` (the only real route) and putting the section in
-/// a query parameter keeps this purely cosmetic, as intended, without ever
-/// touching go_router's path matching.
+/// This app uses `usePathUrlStrategy()` (phase 6) — the path itself (`/`)
+/// is the only real route go_router matches, and the fragment is purely a
+/// cosmetic in-page anchor the browser never sends to the server. That
+/// makes this safe to keep simple, unlike the phase 0-4 hash-strategy
+/// workaround this replaces (`#/?section=about`), which had to keep the
+/// path valid because the fragment WAS the matched path back then.
 abstract final class HashSync {
   static const Map<SectionId, String> _sectionNames = {
     SectionId.browserHero: 'home',
@@ -30,12 +27,8 @@ abstract final class HashSync {
   static String _nameFor(SectionId id) => _sectionNames[id] ?? 'home';
 
   static SectionId? sectionForHash(String hash) {
-    final clean = hash.replaceFirst('#', '');
-    if (clean.isEmpty) return null;
-    // clean looks like "/?section=about" (or just "/" with no query).
-    final uri = Uri.tryParse(clean);
-    final name = uri?.queryParameters['section'];
-    if (name == null) return null;
+    final name = hash.replaceFirst('#', '');
+    if (name.isEmpty) return null;
     for (final entry in _sectionNames.entries) {
       if (entry.value == name) return entry.key;
     }
@@ -59,23 +52,15 @@ abstract final class HashSync {
     );
   }
 
-  // Passing `state` back unchanged (never `null`) is essential: go_router
-  // stores its own routing-match metadata in `history.state`, and clobbering
-  // it with `null` leaves the Router unable to restore/re-match its route
-  // the next time something (e.g. a focus-change event) triggers its own
-  // didChangeDependencies/restoreState cycle — it throws an internal
-  // assertion trying to match against a location it no longer has state
-  // context for.
   static void _replaceHash(SectionId id) {
     // Deferred a microtask: calling history.replaceState synchronously
-    // inside a build/event-dispatch callback races go_router's own Router
-    // widget restoreState cycle, which throws an internal assertion trying
-    // to re-match the just-changed URL. Deferring avoids the reentrancy.
+    // inside a build/event-dispatch callback can race the Router widget's
+    // own restoreState cycle (see docs/AUDIT.md). Deferring avoids it.
     scheduleMicrotask(() {
       web.window.history.replaceState(
         web.window.history.state,
         '',
-        '#/?section=${_nameFor(id)}',
+        '${web.window.location.pathname}#${_nameFor(id)}',
       );
     });
   }

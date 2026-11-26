@@ -61,6 +61,14 @@ class _PakWidgetState extends State<PakWidget> with SingleTickerProviderStateMix
     final accent = NetLayers.accentFor(scrollProgress.activeLayer);
     final speed = (targetLength - _displayedLength).abs();
 
+    Offset? gazeOffset;
+    final gazeTarget = pak.gazeTarget;
+    if (gazeTarget != null && pak.currentMood == PakMood.lookingAt) {
+      final delta = gazeTarget - position;
+      final distance = delta.distance;
+      gazeOffset = distance > 0.01 ? delta / distance : Offset.zero;
+    }
+
     _visual.value = PakVisual(
       position: position,
       mood: speed > 40 ? PakMood.fast : pak.currentMood,
@@ -68,6 +76,8 @@ class _PakWidgetState extends State<PakWidget> with SingleTickerProviderStateMix
       accent: accent,
       encrypted: pak.encrypted,
       carrying: pak.carrying,
+      time: elapsed.inMicroseconds / 1000000.0,
+      gazeOffset: gazeOffset,
     );
   }
 

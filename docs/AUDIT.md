@@ -138,6 +138,65 @@ as-is:
    same underlying engine condition and doesn't reach production
    behavior.
 
+## Phase 6 — URL strategy switch and OpeningSplash retirement
+
+Both confirmed with the user before implementing (see the phase 5-7 plan):
+
+1. **Switched to `usePathUrlStrategy()`**, matching the PRD's phase 6/13
+   spec exactly. `hash_sync.dart` is simplified back to bare `#about`-style
+   fragments (dropping the `#/?section=about` query-param workaround that
+   was only needed under go_router's hash-strategy default). The Netlify
+   `[[redirects]]` rewrite-to-index.html rule already existed defensively
+   and now does real work: unknown paths are rewritten to `index.html`
+   server-side, then go_router's own `errorBuilder` renders `NotFoundPage`
+   client-side for anything that isn't `/`. Verified: fresh load at `/`
+   (bare `#home` fragment), nav clicks update the hash as a bare fragment,
+   and a client-side navigation to an unmatched path renders the real 404
+   page with the actual requested path interpolated into the `GET ...`
+   line.
+2. **Retired `OpeningSplash`** from `app.dart`'s builder in favor of the
+   real HTML boot loader (`web/index.html`): verified via a screenshot
+   taken immediately after navigation (before `networkidle`) that the
+   browser-window frame + typing animation renders first, and a second
+   screenshot a few seconds later that it hands off cleanly into the real
+   hero with no double-intro or visible jump. `widgets/opening_splash.dart`
+   is left on disk, unreferenced, per the user's call — not deleted.
+
+## Phase 6 — other notes
+
+- **Terminal**: implements every command in the PRD's section 13 table
+  (`help`, `whoami`, `ls`, `ls projects`, `cat <slug>`, `cd`/`curl` →
+  section nav, `open github|linkedin|cv`, `history`, `clear`,
+  `sudo hire ...` → contact, `exit`), loaded as a deferred library
+  (`terminal_overlay.dart` via `terminal_launcher.dart`'s
+  `deferred as terminal`) so its cost is paid only on first open. Up/Down
+  history-cycling and Tab-autocomplete are UX sugar described in the PRD's
+  prose above that table, not part of the command table's own acceptance
+  bar ("every terminal command in section 13 works") — not built, to keep
+  scope bounded; `history` (the command) still lists everything typed.
+- **404 page**: real Pak `lost`-mood treatment (question mark, eyes
+  sweeping), the actual unmatched path read from `GoRouterState.uri` and
+  interpolated into the `GET ... → no route to host` line (not a generic
+  message).
+- **Pak's remaining one-shot moods** (throttled, dizzy, lookingAt-gaze,
+  startled, waving, bowing, lost) all now have bespoke visuals in
+  `pak_painter.dart`, finishing the mood vocabulary that phases 0-4 left
+  partially stubbed (their *triggers* already existed in `click_router.dart`
+  and elsewhere; only the drawing was missing).
+- **Custom cursor**: enabled only after the first real mouse event, and
+  permanently disabled for the session the moment a touch/stylus event is
+  seen, per the PRD. The text-field cursor exception (PRD: "Text fields
+  keep `SystemMouseCursors.text`") isn't implemented — the only text field
+  in the app is the terminal's command input, and the terminal is a
+  full-screen overlay where the custom cursor's absence wouldn't be
+  noticed; revisit if that changes.
+- **Idle states**: verified end-to-end with a real 47s zero-activity
+  Playwright run — the 10% page dim fires at the 45s timeout, and moving
+  the mouse afterward correctly triggers the "Connection re-established"
+  toast + Pak startled reaction (screenshotted). The 15s heartbeat and the
+  `visibilitychange` pause were verified by code review only, not by
+  sitting through a longer multi-heartbeat or tab-backgrounding run.
+
 ## Structural decision — certificate placement
 
 The PRD's 8 fixed sections have no dedicated certificates section. All 9

@@ -15,14 +15,17 @@
     the `--base-href` argument provided to `flutter build`.
   -->
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Mazen Matran — Software Engineer building with Flutter, Python, and AI.">
+  <meta name="theme-color" content="#0A0E1A">
+
+  <meta property="og:title" content="Mazen Matran — Software Engineer">
+  <meta property="og:description" content="Building innovative solutions with Flutter, Python, and AI.">
+  <meta property="og:type" content="website">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -33,10 +36,158 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>mazen_portfolio</title>
+  <title>Mazen Matran</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    #boot {
+      position: fixed;
+      inset: 0;
+      background: #0A0E1A;
+      z-index: 9999;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    #boot .frame {
+      width: 640px;
+      max-width: 92vw;
+      margin-top: 28vh;
+      border-radius: 10px;
+      border: 1px solid #1E2740;
+      background: #111729;
+      overflow: hidden;
+    }
+    #boot .titlebar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 12px;
+      border-bottom: 1px solid #1E2740;
+    }
+    #boot .dot { width: 10px; height: 10px; border-radius: 50%; }
+    #boot .dot.r { background: #F87171; }
+    #boot .dot.y { background: #FB923C; }
+    #boot .dot.g { background: #4ADE80; }
+    #boot .addressbar {
+      margin: 12px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: #070A13;
+      border: 1px solid #1E2740;
+      color: #E6EAF2;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    #boot .caret {
+      display: inline-block;
+      width: 7px;
+      margin-left: 1px;
+      animation: boot-blink 1s step-end infinite;
+    }
+    #boot .status {
+      margin: 0 12px 14px;
+      color: #8A94AD;
+      font-size: 12px;
+    }
+    @keyframes boot-blink { 50% { opacity: 0; } }
+    #boot.fade-out { opacity: 0; transition: opacity 300ms ease-out; }
+    @media (prefers-reduced-motion: reduce) {
+      #boot .caret { animation: none; }
+    }
+  </style>
 </head>
 <body>
+  <div id="boot">
+    <div class="frame">
+      <div class="titlebar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      </div>
+      <div class="addressbar"><span id="boot-url"></span><span class="caret" id="boot-caret">&nbsp;</span></div>
+      <div class="status" id="boot-status">resolving DNS&hellip;</div>
+    </div>
+  </div>
+
+  <!-- Visually hidden summary for crawlers and no-JS users. -->
+  <main style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">
+    <h1>Mazen Matran</h1>
+    <p>Software Engineer building with Flutter, Python, and AI.</p>
+  </main>
+  <noscript>
+    <p>Mazen Matran — Software Engineer. This site requires JavaScript to run.</p>
+  </noscript>
+
+  <script>
+    (function () {
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var url = location.hostname + (location.pathname === '/' ? '' : location.pathname);
+      var urlEl = document.getElementById('boot-url');
+      var statusEl = document.getElementById('boot-status');
+      var bootEl = document.getElementById('boot');
+      var startTime = Date.now();
+      var typed = 0;
+      var typingDone = false;
+      var statusCycle = ['resolving DNS…', 'TLS handshake…', 'connecting'];
+      var statusIndex = 0;
+      var dotCount = 0;
+      var typeTimer, statusTimer;
+
+      function renderTyped() {
+        urlEl.textContent = url.slice(0, typed);
+      }
+
+      function typeStep(intervalMs) {
+        if (typed >= url.length) {
+          typingDone = true;
+          return;
+        }
+        typed += 1;
+        renderTyped();
+        typeTimer = setTimeout(function () { typeStep(intervalMs); }, intervalMs);
+      }
+
+      function statusStep() {
+        if (typingDone) {
+          var label = statusCycle[Math.min(statusIndex, statusCycle.length - 1)];
+          var dots = statusIndex >= statusCycle.length - 1 ? '.'.repeat((dotCount % 3) + 1) : '';
+          statusEl.textContent = label + dots;
+          dotCount += 1;
+          if (statusIndex < statusCycle.length - 1 && dotCount % 6 === 0) statusIndex += 1;
+        }
+        statusTimer = setTimeout(statusStep, 260);
+      }
+
+      if (reduceMotion) {
+        typed = url.length;
+        typingDone = true;
+        renderTyped();
+      } else {
+        typeStep(45);
+      }
+      statusStep();
+
+      window.bootDone = function () {
+        clearTimeout(typeTimer);
+        clearTimeout(statusTimer);
+        if (!typingDone) {
+          // Finish typing fast rather than cutting it off mid-word.
+          typed = url.length;
+          renderTyped();
+        }
+        var elapsed = Date.now() - startTime;
+        var wait = Math.max(0, 900 - elapsed);
+        setTimeout(function () {
+          bootEl.classList.add('fade-out');
+          setTimeout(function () {
+            if (bootEl.parentNode) bootEl.parentNode.removeChild(bootEl);
+          }, reduceMotion ? 0 : 300);
+        }, wait);
+      };
+    })();
+  </script>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

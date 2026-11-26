@@ -6,6 +6,7 @@ import '../core/strings/app_strings.dart';
 import '../core/tokens.dart';
 import '../interaction/interactive.dart';
 import '../scroll/scroll_progress.dart';
+import '../widgets/terminal_launcher.dart';
 import 'nav_controller.dart';
 import 'section_registry.dart';
 
@@ -124,6 +125,7 @@ class _Logo extends StatelessWidget {
               context,
               SectionId.browserHero,
             ),
+        onLongPress: () => context.read<TerminalLauncherController>().requestOpen(),
         child: Text(
           '<mm/>',
           textDirection: TextDirection.ltr,
