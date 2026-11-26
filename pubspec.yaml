@@ -41,6 +41,7 @@ dependencies:
   rive: ^0.13.10               # if it uses Rive animations
   url_launcher: ^6.3.0
   provider: ^6.1.2             # theme / locale / sidebar global state
+  web: ^1.1.0                  # history.replaceState / location.hash (nav hash sync)
   flutter_localizations:
     sdk: flutter                # RTL/LTR + locale support (en/ar)
 
