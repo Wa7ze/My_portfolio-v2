@@ -1,28 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../core/strings/app_strings.dart';
 import '../core/tokens.dart';
+import '../interaction/cv_download_button.dart';
 import '../interaction/net_button.dart';
 import '../navigation/nav_controller.dart';
 import '../navigation/section_registry.dart';
 import 'section_scaffold.dart';
 
-const _kCvPdfAsset = 'assets/files/Mazen_Matran_CV.pdf';
-
 /// Section 0 — Browser (hero). #home, browser layer, "GET / HTTP/1.1".
 class BrowserHeroSection extends StatelessWidget {
   const BrowserHeroSection({super.key});
-
-  Future<NetResult> _downloadCv() async {
-    // Flutter web serves pubspec assets under an extra `assets/` prefix.
-    final uri = Uri.base.resolve('assets/$_kCvPdfAsset');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-      return const NetResult.success(label: 'OK');
-    }
-    return const NetResult.error(statusCode: 404, label: 'Not Found');
-  }
 
   Future<NetResult> _viewProjectsRequest(BuildContext context) async {
     context.read<NavController>().goTo(context, SectionId.apiProjects);
@@ -67,11 +55,7 @@ class BrowserHeroSection extends StatelessWidget {
                 label: strings.heroCtaWork,
                 onRequest: () => _viewProjectsRequest(context),
               ),
-              NetButton(
-                label: strings.downloadCvButton,
-                variant: NetButtonVariant.ghost,
-                onRequest: _downloadCv,
-              ),
+              CvDownloadButton(label: strings.downloadCvButton),
             ],
           ),
         ],

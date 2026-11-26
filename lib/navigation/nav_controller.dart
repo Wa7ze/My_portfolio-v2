@@ -15,7 +15,7 @@ class NavController extends ChangeNotifier {
   SectionId _activeSection = SectionId.browserHero;
   SectionId get activeSection => _activeSection;
 
-  void goTo(BuildContext context, SectionId id) {
+  void goTo(BuildContext context, SectionId id, {Duration? fixedDuration}) {
     final targetContext = SectionRegistry.keyFor(id).currentContext;
     if (targetContext == null) return;
 
@@ -32,16 +32,22 @@ class NavController extends ChangeNotifier {
           path.lengthForStation(id),
         );
 
-    final currentOffset = Scrollable.of(targetContext).position.pixels;
-    final targetOffset = SectionRegistry.offsetFor(id);
-    final maxScroll = Scrollable.of(targetContext).position.maxScrollExtent;
-    final fraction = maxScroll > 0 ? ((targetOffset - currentOffset).abs() / maxScroll).clamp(0.0, 1.0) : 0.0;
-    final durationMs = Motion.navScrollMin.inMilliseconds +
-        (Motion.navScrollMax.inMilliseconds - Motion.navScrollMin.inMilliseconds) * fraction;
+    Duration duration;
+    if (fixedDuration != null) {
+      duration = fixedDuration;
+    } else {
+      final currentOffset = Scrollable.of(targetContext).position.pixels;
+      final targetOffset = SectionRegistry.offsetFor(id);
+      final maxScroll = Scrollable.of(targetContext).position.maxScrollExtent;
+      final fraction = maxScroll > 0 ? ((targetOffset - currentOffset).abs() / maxScroll).clamp(0.0, 1.0) : 0.0;
+      final durationMs = Motion.navScrollMin.inMilliseconds +
+          (Motion.navScrollMax.inMilliseconds - Motion.navScrollMin.inMilliseconds) * fraction;
+      duration = Duration(milliseconds: durationMs.round());
+    }
 
     Scrollable.ensureVisible(
       targetContext,
-      duration: Duration(milliseconds: durationMs.round()),
+      duration: duration,
       curve: Motion.inOut,
     );
 

@@ -31,20 +31,31 @@ class TracerouteEntry {
   const TracerouteEntry({required this.fromLength, required this.toLength});
 }
 
+class RedirectEntry {
+  final Object id;
+  final Offset globalPosition;
+  final String label;
+  const RedirectEntry({required this.id, required this.globalPosition, required this.label});
+}
+
 /// Holds every transient interaction effect (pings, status badges, the
 /// traceroute highlight), auto-expiring each after its lifetime. Capped at
 /// 6 pings / 4 badges / 1 traceroute alive at once — oldest evicted.
 class EffectsController extends ChangeNotifier {
   final List<PingEntry> _pings = [];
   final List<BadgeEntry> _badges = [];
+  final List<RedirectEntry> _redirects = [];
   TracerouteEntry? _traceroute;
 
   static const maxPings = 6;
   static const maxBadges = 4;
+  static const maxRedirects = 2;
   static const _extraLifetime = Duration(milliseconds: 200);
+  static const _redirectLifetime = Duration(milliseconds: 900);
 
   List<PingEntry> get pings => List.unmodifiable(_pings);
   List<BadgeEntry> get badges => List.unmodifiable(_badges);
+  List<RedirectEntry> get redirects => List.unmodifiable(_redirects);
   TracerouteEntry? get traceroute => _traceroute;
 
   static final _pingLabelWeights = <MapEntry<String, double>>[
@@ -87,6 +98,16 @@ class EffectsController extends ChangeNotifier {
     notifyListeners();
     Future.delayed(Motion.badgeFloat + _extraLifetime, () {
       if (_badges.remove(entry)) notifyListeners();
+    });
+  }
+
+  void addRedirect(Offset globalPosition, {required String label}) {
+    final entry = RedirectEntry(id: UniqueKey(), globalPosition: globalPosition, label: label);
+    _redirects.add(entry);
+    if (_redirects.length > maxRedirects) _redirects.removeAt(0);
+    notifyListeners();
+    Future.delayed(_redirectLifetime + _extraLifetime, () {
+      if (_redirects.remove(entry)) notifyListeners();
     });
   }
 

@@ -4,8 +4,8 @@ import '../core/strings/app_strings.dart';
 import '../core/tokens.dart';
 import '../data/models.dart';
 import '../data/portfolio_content.dart';
-import '../interaction/interactive.dart';
 import '../interaction/net_button.dart';
+import '../interaction/net_link.dart';
 import '../navigation/section_registry.dart';
 import 'section_scaffold.dart';
 
@@ -66,23 +66,21 @@ class _SocialRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = AppPalette.of(context);
-    return Interactive(
-      child: GestureDetector(
-        onTap: () => launchUrl(Uri.parse(link.url), mode: LaunchMode.externalApplication),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16, vertical: AppSpacing.s12),
-          decoration: BoxDecoration(
-            border: Border.all(color: palette.line),
-            borderRadius: BorderRadius.circular(AppRadii.md),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(link.label, style: AppType.monoLabel.copyWith(color: palette.textMuted)),
-              Text(link.value, style: AppType.mono.copyWith(color: AppColors.netCyan)),
-            ],
-          ),
+    return NetLink(
+      url: Uri.parse(link.url),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16, vertical: AppSpacing.s12),
+        decoration: BoxDecoration(
+          border: Border.all(color: palette.line),
+          borderRadius: BorderRadius.circular(AppRadii.md),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(link.label, style: AppType.monoLabel.copyWith(color: palette.textMuted)),
+            Text(link.value, style: AppType.mono.copyWith(color: AppColors.netCyan)),
+          ],
         ),
       ),
     );

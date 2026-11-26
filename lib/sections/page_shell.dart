@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../interaction/click_router.dart';
@@ -6,8 +7,10 @@ import '../navigation/hash_sync.dart';
 import '../navigation/nav_bar.dart';
 import '../navigation/section_registry.dart';
 import '../scene/background_layer.dart';
+import '../scene/pak/pak_state.dart';
 import '../scene/pak/pak_widget.dart';
 import '../scene/path_painter.dart';
+import '../scroll/eof_scroll_physics.dart';
 import '../scroll/scroll_progress.dart';
 import '../widgets/latency_counter.dart';
 import 's0_browser_hero.dart';
@@ -36,6 +39,11 @@ class _PageShellState extends State<PageShell> with WidgetsBindingObserver {
   ScrollProgress? _scrollProgress;
   bool _initialHashHandled = false;
   SectionId? _lastHashSection;
+
+  // End-of-page teardown trigger (PRD section 12): fires once per arrival
+  // within 40px of the bottom, re-arms once scrolled back up past 400px
+  // from the bottom.
+  bool _endArmed = true;
 
   @override
   void initState() {
@@ -86,6 +94,40 @@ class _PageShellState extends State<PageShell> with WidgetsBindingObserver {
       _lastHashSection = active;
       HashSync.onScrollActiveSectionChanged(active);
     }
+    _checkEndTrigger();
+  }
+
+  void _checkEndTrigger() {
+    if (!controller.hasClients) return;
+    final position = controller.position;
+    final distanceFromEnd = position.maxScrollExtent - position.pixels;
+    final scrollProgress = _scrollProgress;
+    if (scrollProgress == null) return;
+
+    if (_endArmed && distanceFromEnd <= 40) {
+      _endArmed = false;
+      scrollProgress.setEnded(true);
+      context.read<PakController>().react(PakMood.bowing, duration: const Duration(milliseconds: 900));
+    } else if (!_endArmed && distanceFromEnd >= 400) {
+      _endArmed = true;
+      scrollProgress.setEnded(false);
+    }
+  }
+
+  void _onPointerSignal(PointerSignalEvent event) {
+    if (event is! PointerScrollEvent) return;
+    if (!controller.hasClients) return;
+    final position = controller.position;
+    if (position.pixels < position.maxScrollExtent - 0.5) return;
+    if (event.scrollDelta.dy <= 0) return;
+    _scrollProgress?.addPull(event.scrollDelta.dy / 600);
+  }
+
+  bool _onOverscroll(OverscrollNotification notification) {
+    if (notification.metrics.pixels >= notification.metrics.maxScrollExtent - 0.5 && notification.overscroll > 0) {
+      _scrollProgress?.addPull(notification.overscroll / 120);
+    }
+    return false;
   }
 
   @override
@@ -104,28 +146,35 @@ class _PageShellState extends State<PageShell> with WidgetsBindingObserver {
       body: Stack(
         children: [
           const Positioned.fill(child: BackgroundLayer()),
-          SingleChildScrollView(
-            controller: controller,
-            child: ClickRouter(
-              child: Stack(
-                children: const [
-                  Column(
-                    children: [
-                      SizedBox(height: NavBar.height),
-                      BrowserHeroSection(),
-                      NetworkAboutSection(),
-                      GatewaySkillsSection(),
-                      ApiProjectsSection(),
-                      LogicApproachSection(),
-                      DatabaseExperienceSection(),
-                      ResponseContactSection(),
-                      TeardownFooterSection(),
+          Listener(
+            onPointerSignal: _onPointerSignal,
+            child: NotificationListener<OverscrollNotification>(
+              onNotification: _onOverscroll,
+              child: SingleChildScrollView(
+                controller: controller,
+                physics: const EofScrollPhysics(),
+                child: ClickRouter(
+                  child: Stack(
+                    children: const [
+                      Column(
+                        children: [
+                          SizedBox(height: NavBar.height),
+                          BrowserHeroSection(),
+                          NetworkAboutSection(),
+                          GatewaySkillsSection(),
+                          ApiProjectsSection(),
+                          LogicApproachSection(),
+                          DatabaseExperienceSection(),
+                          ResponseContactSection(),
+                          TeardownFooterSection(),
+                        ],
+                      ),
+                      Positioned.fill(child: IgnorePointer(child: PathLayer())),
+                      Positioned.fill(child: IgnorePointer(child: PakWidget())),
+                      Positioned.fill(child: EffectsLayer()),
                     ],
                   ),
-                  Positioned.fill(child: IgnorePointer(child: PathLayer())),
-                  Positioned.fill(child: IgnorePointer(child: PakWidget())),
-                  Positioned.fill(child: EffectsLayer()),
-                ],
+                ),
               ),
             ),
           ),

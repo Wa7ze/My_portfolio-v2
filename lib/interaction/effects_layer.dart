@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'effects/ping_effect.dart';
+import 'effects/redirect_effect.dart';
 import 'effects/status_badge_effect.dart';
 import 'effects/traceroute_effect.dart';
 import 'effects_controller.dart';
@@ -38,6 +39,8 @@ class EffectsLayer extends StatelessWidget {
                   label: badge.label,
                   isError: badge.isError,
                 ),
+              for (final redirect in effects.redirects)
+                RedirectEffect(key: ValueKey(redirect.id), position: toLocal(redirect.globalPosition), label: redirect.label),
               if (effects.traceroute case final tr?)
                 TracerouteEffect(fromLength: tr.fromLength, toLength: tr.toLength),
             ],

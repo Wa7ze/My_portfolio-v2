@@ -19,6 +19,8 @@ class ScrollProgress extends ChangeNotifier {
   NetLayer _activeLayer = NetLayer.browser;
   SectionId _activeSection = SectionId.browserHero;
   final Set<SectionId> _revealed = {};
+  bool _ended = false;
+  double? _roundTripMs;
 
   double get progress => _progress;
   double get offsetPx => _offsetPx;
@@ -27,6 +29,60 @@ class ScrollProgress extends ChangeNotifier {
   NetLayer get activeLayer => _activeLayer;
   SectionId get activeSection => _activeSection;
   Set<SectionId> get revealed => _revealed;
+
+  /// True once the teardown sequence (end of page) has fired and frozen
+  /// the latency counter; cleared by [PageShell]'s re-arm logic when the
+  /// user scrolls back up past the threshold.
+  bool get ended => _ended;
+  double? get roundTripMs => _roundTripMs;
+
+  void setEnded(bool value) {
+    if (_ended == value) return;
+    _ended = value;
+    if (value) _roundTripMs = 12 + _progress * 1368;
+    notifyListeners();
+  }
+
+  // --- EOF overscroll marker (PRD section 12) ---
+  double _pull = 0;
+  double _pullVelocity = 0;
+  Timer? _pullDecayTimer;
+  Timer? _pullSpring;
+
+  static const _pullSpringStiffness = 300.0;
+  static const _pullSpringDamping = 20.0;
+  static const _pullSpringMass = 1.0;
+  static const _pullSpringTick = Duration(milliseconds: 16);
+
+  double get pull => _pull;
+
+  /// Called on overscroll-past-bottom (touch/trackpad `OverscrollNotification`
+  /// or a clamped mouse-wheel `PointerScrollEvent`). Re-arms the 150ms
+  /// no-new-pull timer that triggers the spring-back.
+  void addPull(double delta) {
+    _pullSpring?.cancel();
+    _pullVelocity = 0;
+    _pull = (_pull + delta).clamp(0.0, 1.0);
+    _scheduleNotify();
+    _pullDecayTimer?.cancel();
+    _pullDecayTimer = Timer(const Duration(milliseconds: 150), _startPullSpringBack);
+  }
+
+  void _startPullSpringBack() {
+    _pullSpring?.cancel();
+    _pullSpring = Timer.periodic(_pullSpringTick, (timer) {
+      const dt = 0.016;
+      final force = -_pullSpringStiffness * _pull - _pullSpringDamping * _pullVelocity;
+      _pullVelocity += (force / _pullSpringMass) * dt;
+      _pull += _pullVelocity * dt;
+      if (_pull.abs() < 0.001 && _pullVelocity.abs() < 0.001) {
+        _pull = 0;
+        _pullVelocity = 0;
+        timer.cancel();
+      }
+      _scheduleNotify();
+    });
+  }
 
   double? _lastOffset;
   int? _lastTimeMs;
@@ -112,6 +168,8 @@ class ScrollProgress extends ChangeNotifier {
   @override
   void dispose() {
     _decayTimer?.cancel();
+    _pullDecayTimer?.cancel();
+    _pullSpring?.cancel();
     super.dispose();
   }
 }

@@ -121,6 +121,22 @@ as-is:
    app's control. It's caught by Flutter's own error boundary and doesn't
    affect rendering or interaction (confirmed via screenshots at every
    checkpoint) — left as a known environment/Flutter-engine quirk.
+4. **Phase 5 finding — same quirk, debug-mode-only transient symptom.**
+   While verifying the end-of-page teardown trigger, a debug-mode-only
+   `flutter run -d web-server` session showed `ScrollPosition.maxScrollExtent`
+   jump to an absurd value for a few frames exactly when the teardown
+   sequence's widgets first entered the tree, then self-correct within
+   about a second with no further recurrence. It reproduces 1:1 with the
+   same `_RenderTheater`/focus-traversal stack trace above (same trigger:
+   a tree change while focus traversal is mid-recalculation) and — unlike
+   that console noise — isn't just silent: for one debug-mode frame the
+   reported scroll extent is briefly wrong. Verified in a **release**
+   build (`flutter build web`, the actual deploy artifact) across repeated
+   scroll-to-bottom runs with rapid-fire screenshots through the trigger
+   window: no visible blank gap, no layout jump, nothing a real visitor
+   would see. Left as-is, consistent with item 3 above, since it's the
+   same underlying engine condition and doesn't reach production
+   behavior.
 
 ## Structural decision — certificate placement
 

@@ -11,9 +11,15 @@ class LatencyCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = context.watch<ScrollProgress>().progress;
+    final scroll = context.watch<ScrollProgress>();
     final palette = AppPalette.of(context);
-    final ms = (12 + progress * 1368).round();
+    final ended = scroll.ended;
+    final ms = (12 + scroll.progress * 1368).round();
+
+    final label = ended
+        ? 'Round trip: ${((scroll.roundTripMs ?? ms) / 1000).toStringAsFixed(2)}s'
+        : '${ms}ms';
+    final color = ended ? AppColors.okGreen : palette.textMuted;
 
     return Positioned.fill(
       child: Align(
@@ -24,13 +30,13 @@ class LatencyCounter extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s12, vertical: AppSpacing.s4),
             decoration: BoxDecoration(
               color: palette.bgRaised.withValues(alpha: 0.8),
-              border: Border.all(color: palette.line),
+              border: Border.all(color: ended ? AppColors.okGreen : palette.line),
               borderRadius: BorderRadius.circular(AppRadii.pill),
             ),
             child: Text(
-              '${ms}ms',
+              label,
               textDirection: TextDirection.ltr,
-              style: AppType.mono.copyWith(color: palette.textMuted),
+              style: AppType.mono.copyWith(color: color),
             ),
           ),
         ),
