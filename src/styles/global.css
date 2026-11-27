@@ -1,0 +1,221 @@
+@import 'tailwindcss';
+@import './theme.css';
+
+/* ---------- Named z-index layers (values live in theme.css) ---------- */
+@utility z-story {
+  z-index: var(--z-story);
+}
+@utility z-content {
+  z-index: var(--z-content);
+}
+@utility z-nav {
+  z-index: var(--z-nav);
+}
+@utility z-effects {
+  z-index: var(--z-effects);
+}
+@utility z-grain {
+  z-index: var(--z-grain);
+}
+@utility z-cursor {
+  z-index: var(--z-cursor);
+}
+@utility z-terminal {
+  z-index: var(--z-terminal);
+}
+@utility z-skip {
+  z-index: var(--z-skip);
+}
+
+/* ---------- Glass panel: readable content over the animated story ---------- */
+@utility panel {
+  background-color: var(--color-panel);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
+  backdrop-filter: blur(var(--blur-panel)) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--blur-panel)) saturate(1.2);
+}
+
+/* Round icon button used by the lightbox and terminal */
+@utility lb-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-line-strong);
+  background: var(--color-panel-strong);
+  color: var(--color-ink);
+  font-size: 1.25rem;
+  transition:
+    color 150ms,
+    border-color 150ms;
+  &:hover {
+    color: var(--color-cyan);
+    border-color: var(--color-cyan);
+  }
+}
+
+/* Small mono uppercase label (eyebrows, field labels) */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--text-label--letter-spacing);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+@layer base {
+  html {
+    background: var(--color-navy-950);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: calc(var(--nav-height) + 1rem);
+  }
+
+  html[lang='ar'] body {
+    font-family: 'IBM Plex Sans Arabic', var(--font-body);
+  }
+
+  /* Letter-spacing breaks Arabic letter joining; Latin protocol labels are dir=ltr anyway. */
+  html[lang='ar'] :where(.label-mono, [class*='tracking-']):not([dir='ltr']) {
+    letter-spacing: 0;
+  }
+
+  body {
+    min-height: 100dvh;
+    background: var(--bg-gradient);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: rgb(255 181 71 / 0.35);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-cyan);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Lenis recommended base styles */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow: clip;
+  }
+  .lenis [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  /* Custom cursor active: hide the system cursor, but keep the text caret in fields. */
+  html.custom-cursor,
+  html.custom-cursor * {
+    cursor: none !important;
+  }
+  html.custom-cursor input,
+  html.custom-cursor textarea {
+    cursor: text !important;
+  }
+
+  dialog::backdrop {
+    background: rgb(5 10 22 / 0.82);
+    backdrop-filter: blur(6px);
+  }
+}
+
+/* ---------- Film grain: static SVG noise over everything, never interactive ---------- */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-grain);
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Section reveal initial state (JS removes it; no-JS & reduced motion see content) ---------- */
+.js-reveal [data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--dur-reveal) var(--ease-out-cubic),
+    transform var(--dur-reveal) var(--ease-out-cubic);
+}
+.js-reveal [data-reveal='done'] {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Keyframes used by effects ---------- */
+@keyframes ping-ring {
+  from {
+    transform: translate(-50%, -50%) scale(0.25);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+@keyframes float-up {
+  from {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, calc(-50% - 32px));
+    opacity: 0;
+  }
+}
+@keyframes fade-hold {
+  0% {
+    opacity: 0;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes pop-in {
+  0% {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0;
+  }
+  18% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}

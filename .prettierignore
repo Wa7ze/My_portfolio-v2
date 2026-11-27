@@ -1,0 +1,10 @@
+legacy
+dist
+node_modules
+screenshots
+.lighthouse
+package-lock.json
+CONTENT_INVENTORY.md
+
+# User-owned story spec: never reformat (see CLAUDE.md)
+STORY.md

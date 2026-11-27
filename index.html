@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mazen Matran | Portfolio</title>
+    <meta
+      name="description"
+      content="Mazen Matran | Software Engineer building with Flutter, Python, and AI."
+    />
+    <link rel="canonical" href="https://mazenportfolio.netlify.app/" />
+    <meta name="theme-color" content="#0B1426" />
+    <meta name="color-scheme" content="dark" />
+
+    <meta property="og:title" content="Mazen Matran | Software Engineer" />
+    <meta property="og:description" content="Building innovative solutions with Flutter, Python, and AI." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mazenportfolio.netlify.app/" />
+    <meta property="og:image" content="https://mazenportfolio.netlify.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Mazen Matran | Software Engineer" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Mazen Matran | Software Engineer" />
+    <meta name="twitter:description" content="Building innovative solutions with Flutter, Python, and AI." />
+    <meta name="twitter:image" content="https://mazenportfolio.netlify.app/og-image.png" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Mazen Matran" />
+    <link rel="apple-touch-icon" href="/icons/Icon-192.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <!-- Preload the Latin display/mono fonts (same files the @fontsource CSS uses) to avoid a late swap. -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2"
+    />
+
+    <script>
+      // Section reveal is a progressive enhancement: only hide sections when motion is allowed.
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('js-reveal');
+      }
+    </script>
+    <style>
+      /* Boot loader (ported from the legacy web/index.html). Inline so it paints before the bundle. */
+      html {
+        background: #0b1426;
+      }
+      #boot {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        background: linear-gradient(180deg, #0b1426, #16233f);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      #boot .frame {
+        width: 640px;
+        max-width: 92vw;
+        margin-top: 28vh;
+        border-radius: 14px;
+        border: 1px solid rgb(61 224 255 / 0.22);
+        background: rgb(15 26 49 / 0.9);
+        overflow: hidden;
+        box-shadow: 0 24px 60px -24px rgb(5 10 22 / 0.8);
+      }
+      #boot .titlebar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 12px;
+        border-bottom: 1px solid rgb(61 224 255 / 0.14);
+      }
+      #boot .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      #boot .dot.r {
+        background: #ff7a85;
+      }
+      #boot .dot.y {
+        background: #ffb547;
+      }
+      #boot .dot.g {
+        background: #5ef0a8;
+      }
+      #boot .addressbar {
+        margin: 12px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: #0b1426;
+        border: 1px solid rgb(61 224 255 / 0.14);
+        color: #eaf0fa;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      #boot .caret {
+        display: inline-block;
+        width: 7px;
+        margin-left: 1px;
+        background: #3de0ff;
+        animation: boot-blink 1s step-end infinite;
+      }
+      #boot .status {
+        margin: 0 12px 14px;
+        color: #8f9fc0;
+        font-size: 12px;
+      }
+      @keyframes boot-blink {
+        50% {
+          opacity: 0;
+        }
+      }
+      #boot.fade-out {
+        opacity: 0;
+        transition: opacity 300ms ease-out;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot {
+          display: none;
+        }
+      }
+    </style>
+    <noscript
+      ><style>
+        #boot {
+          display: none;
+        }
+      </style></noscript
+    >
+  </head>
+  <body>
+    <div id="boot" aria-hidden="true">
+      <div class="frame">
+        <div class="titlebar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        </div>
+        <div class="addressbar"><span id="boot-url"></span><span class="caret">&nbsp;</span></div>
+        <div class="status" id="boot-status">resolving DNS&hellip;</div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var boot = document.getElementById('boot');
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          boot.remove();
+          return;
+        }
+        var url = location.hostname + (location.pathname === '/' ? '' : location.pathname);
+        var urlEl = document.getElementById('boot-url');
+        var statusEl = document.getElementById('boot-status');
+        var start = Date.now(),
+          typed = 0,
+          typingDone = false,
+          dotCount = 0,
+          statusIndex = 0;
+        var cycle = ['resolving DNS…', 'TLS handshake…', 'connecting'];
+        var typeTimer, statusTimer;
+        function render() {
+          urlEl.textContent = url.slice(0, typed);
+        }
+        (function typeStep() {
+          if (typed >= url.length) {
+            typingDone = true;
+            return;
+          }
+          typed += 1;
+          render();
+          typeTimer = setTimeout(typeStep, 45);
+        })();
+        (function statusStep() {
+          if (typingDone) {
+            var label = cycle[Math.min(statusIndex, cycle.length - 1)];
+            var dots = statusIndex >= cycle.length - 1 ? '.'.repeat((dotCount % 3) + 1) : '';
+            statusEl.textContent = label + dots;
+            dotCount += 1;
+            if (statusIndex < cycle.length - 1 && dotCount % 6 === 0) statusIndex += 1;
+          }
+          statusTimer = setTimeout(statusStep, 260);
+        })();
+        window.bootDone = function () {
+          clearTimeout(typeTimer);
+          clearTimeout(statusTimer);
+          typed = url.length;
+          render();
+          setTimeout(
+            function () {
+              boot.classList.add('fade-out');
+              setTimeout(function () {
+                boot.remove();
+              }, 300);
+            },
+            Math.max(0, 600 - (Date.now() - start)),
+          );
+        };
+      })();
+    </script>
+
+    <div id="root">
+      <!-- Visually hidden summary for crawlers/no-JS (as in the legacy site); replaced when the app mounts. -->
+      <main
+        style="
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          overflow: hidden;
+          clip-path: inset(50%);
+          white-space: nowrap;
+        "
+      >
+        <h1>Mazen Matran</h1>
+        <p>Software Engineer building with Flutter, Python, and AI.</p>
+      </main>
+    </div>
+    <noscript>
+      <p style="color: #eaf0fa; text-align: center">
+        Mazen Matran | Software Engineer. This site requires JavaScript to run.
+      </p>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,11 +1,46 @@
+# Netlify config for the Vite build. Same site as the legacy Flutter app
+# (https://mazenportfolio.netlify.app/). See DEPLOY.md for the switch-over steps.
 [build]
-  publish = "build/web"
-  command = "if [ ! -f flutter-sdk/bin/flutter ]; then rm -rf flutter-sdk && git clone https://github.com/flutter/flutter.git -b 3.47.2 --depth 1 flutter-sdk; fi && export PATH=\"$PATH:$(pwd)/flutter-sdk/bin\" && flutter config --enable-web && flutter pub get && flutter build web --release"
+  command = "npm run build"
+  publish = "dist"
 
-# Hash-based routing (go_router's default, used here) never sends the route
-# path to the server, so this isn't required for correctness — it's just a
-# defensive fallback in case a path-based deep link is ever hit directly.
+[build.environment]
+  NODE_VERSION = "24"
+
+# Legacy multi-page routes (pre-redesign Flutter site) -> in-page anchors.
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  from = "/work/*"
+  to = "/#projects"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/work"
+  to = "/#projects"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/about"
+  to = "/#about"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/contact"
+  to = "/#contact"
+  status = 301
+  force = true
+
+# No SPA catch-all: unknown paths get dist/404.html with a real 404 status.
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
